@@ -1,0 +1,16 @@
+{
+  "name": "flowhandler",
+  "version": "1.0.0",
+  "description": "FlowHandler logic to run over the Flow edges",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index",
+    "test": "jest --runInBand"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^29.7.0"
+  }
+}
