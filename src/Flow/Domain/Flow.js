@@ -1,5 +1,3 @@
-const Tree = require('../Domain/Tree')
-
 class Flow{
 
     #nodes

@@ -11,7 +11,6 @@ class ConditionNode extends Node{
         let result
         try {
             if(Array.isArray(edges)){
-                
                 result = eval(
                     `${variables.get(this._data.name)}${this._data.condition}${this._data.value}`
                 );
