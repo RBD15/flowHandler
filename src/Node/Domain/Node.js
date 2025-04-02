@@ -21,7 +21,7 @@ class Node{
         this._data = data
     }
 
-    run(edges,variables){
+    async run(edges,variables){
         
     }
 

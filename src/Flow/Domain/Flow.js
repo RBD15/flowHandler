@@ -7,6 +7,7 @@ class Flow{
     #visitedNodesId
     #nodePrototype
     #variables
+    #ended
 
     constructor(nodes,edges,settings,nodePrototype){
         this.#edges = edges
@@ -15,7 +16,8 @@ class Flow{
         this.#nodePrototype = nodePrototype
         this.#variables = new Map()
         this.#currentNodeId = "1"
-        this.#visitedNodesId = new Set();    
+        this.#visitedNodesId = new Set();
+        this.#ended = false;        
     }
 
     getNodes(){
@@ -30,8 +32,8 @@ class Flow{
         return this.#settings
     }
 
-    nextStep() {
-    
+    async nextStep(input) {
+        this.#variables.set('inter_input',input)
         let stopped = false
 
         if (this.#visitedNodesId.has(this.#currentNodeId)) {
@@ -45,24 +47,33 @@ class Flow{
             if(currentNode.type === 'end'){
                 stopped = true
                 this.#currentNodeId = null
+                this.#ended= true;
                 return
             }
-
+            
             const nextEdges = this.#edges.filter(edge => edge.source === this.#currentNodeId);
             this.#visitedNodesId.add(this.#currentNodeId);
             const tempNode = this.#nodePrototype.getNodeByType(currentNode)
 
             if(this.#isDecisionNode(currentNode.type)){
-                this.#currentNodeId = tempNode.run(nextEdges,this.#variables)
+                this.#currentNodeId = await tempNode.run(nextEdges,this.#variables)
             }else{
-                this.#currentNodeId = tempNode.run(nextEdges[0],this.#variables)
+                this.#currentNodeId = await tempNode.run(nextEdges[0],this.#variables)
             }
         }
         console.log("Terminando");
     }
 
+    getInput(){
+        return this.#variables.get('inter_input')
+    }
+
     #isDecisionNode(type){
-        return type === 'condition' || type === 'switch'
+        return type === 'condition' || type === 'switch' || type === 'intent'
+    }
+
+    isEnded(){
+        return this.#ended
     }
     
 }

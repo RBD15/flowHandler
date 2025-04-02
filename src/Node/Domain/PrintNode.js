@@ -2,22 +2,28 @@ const Node = require('../Domain/Node')
 
 class PrintNode extends Node{
 
-    constructor(id,data){
-        super(id,data)
-        this._type = 'print'
-    }
+  #readInterface
+  constructor(id,data){
+    super(id,data)
+    this._type = 'print'
+  }
 
-    run(edges,variables){
-        const msg = this.#replacePlaceholders(this._data.code, variables)
-        console.log(msg);
-        return edges.target
-    }
+  setReadInterface(readInterface){
+    this.#readInterface = readInterface
+  }
 
-    #replacePlaceholders(inputString, variables) {
-        return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
-          return variables.get(key) || '';
-        });
-      }
+  async run(edges,variables){
+    const msg = this.#replaceVariableReference(this._data.code, variables)
+    const input =  await this.#readInterface.ask(msg); 
+    variables.set('inter_input',input)
+    return edges.target
+  }
+
+  #replaceVariableReference(inputString, variables) {
+    return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
+      return variables.get(key) || '';
+    });
+  }
       
 }
 

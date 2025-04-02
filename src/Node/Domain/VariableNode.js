@@ -7,7 +7,7 @@ class VariableNode extends Node{
         this._type = 'variable'
     }
 
-    run(edges,variables){
+    async run(edges,variables){
         variables.set(this._data.name,this._data.value)
         return edges.target
     }

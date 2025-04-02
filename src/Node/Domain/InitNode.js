@@ -7,8 +7,7 @@ class InitNode extends Node{
         this._type = 'init'
     }
 
-    run(edges,variables){
-        // console.log(`Visitando nodo: ${this._data.label}`);
+    async run(edges,variables){
         return edges.target
     }
 

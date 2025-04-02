@@ -7,7 +7,7 @@ class EndNode extends Node{
         this._type = 'end'
     }
 
-    run(edges,variables){
+    async run(edges,variables){
         
     }
 

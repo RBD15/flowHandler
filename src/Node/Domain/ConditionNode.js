@@ -7,7 +7,7 @@ class ConditionNode extends Node{
         this._type = 'condition'
     }
 
-    run(edges,variables){
+    async run(edges,variables){
         let result
         try {
             if(Array.isArray(edges)){
