@@ -11,9 +11,10 @@ class ConditionNode extends Node{
         let result
         try {
             if(Array.isArray(edges)){
+                const value = this.#replaceVariableReference(this._data.name, variables)
                 result = eval(
-                    `${variables.get(this._data.name)}${this._data.condition}${this._data.value}`
-                );
+                    `${value}${this._data.condition}${this._data.value}`
+                );                
                 if(result){
                     result = 'THEN'
                 }else{
@@ -29,6 +30,11 @@ class ConditionNode extends Node{
         }
     }
 
+    #replaceVariableReference(inputString, variables) {
+        return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
+          return variables.get(key) || '';
+        });
+    }
 }
 
 module.exports = ConditionNode
