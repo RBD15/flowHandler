@@ -1,20 +1,29 @@
+const NodePrototype = require("./NodePrototype")
+const Flow = require("./../Domain/Flow")
+
 class FlowHandler{
-
-    constructor(){
-
+    #data
+    #nodePrototype
+    #flow
+    constructor(data){
+        this.#data = data
+        this.#nodePrototype = new NodePrototype()
+        this.#flow = new Flow(this.#data.nodes,this.#data.edges,{},this.#nodePrototype)
     }
 
-    run(node,edges){
-        if(edges[0].type === "JUMP_TO_START") {
-            console.log("Saltando al nodo inicial.");
-            this.#currentNodeId = nodes.find(node => node.type === "init").id;
-        }else if(edges[0].type === "condition"){
-            if()
+    setFlow(flowState){
+        this.#flow.setState(flowState)
+        return this
+    }
 
-            this.#currentNodeId = edges.target;
-        }else{
-            this.#currentNodeId = edges[0].target;
-        }
+    getFlowState(){
+        return this.#flow.getState()
+    }
+
+    async exec(){
+        await this.#flow.nextStep()
+        console.log(this.#flow.getInput());
+        return
     }
 
 }

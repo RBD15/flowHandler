@@ -1,20 +1,17 @@
+const FlowHandler = require("./src/Flow/Application/FlowHandler")
 const { loadFlow } = require("./src/Flow/Application/FlowLoader")
-const NodePrototype = require("./src/Flow/Application/NodePrototype")
-const Flow = require("./src/Flow/Domain/Flow")
+const path = require('path');
 
-  const data = loadFlow()  
-  const nodePrototype = new NodePrototype()
-  const flow = new Flow(data.nodes,data.edges,{},nodePrototype)
+const fileDir = path.resolve(__dirname)+'/src/data.json'
+const data = loadFlow(fileDir)
 
-  const exec = async () => {
-    let flowStop = false
-    let input
-    while (!flowStop) {
-      await flow.nextStep(input)
-      flowStop = flow.isEnded()
-    }
-    console.log(flow.getInput());
-    console.log("Flow execution ended");
-  }
+async function process(){
+    const flowHandler = new FlowHandler(data)
+    const initState = flowHandler.getFlowState()
+    await flowHandler.exec()
+   flowHandler.setFlow(initState)
+    await flowHandler.exec()
+    await flowHandler.exec()
+} 
 
-  exec()
+process()

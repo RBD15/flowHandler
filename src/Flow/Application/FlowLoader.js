@@ -1,12 +1,8 @@
 const fs = require('fs');
-const path = require('path');
 
-function loadFlow(){
-    
+function loadFlow(fileDir){
     try {
-        const fileDir = path.resolve(__dirname)+'/../../data.json'
         const data = fs.readFileSync(fileDir, 'utf8')
-    
         if (!data) {
             // console.error('Error al leer el archivo JSON:', err);
             return;
