@@ -101,7 +101,6 @@ class Flow{
             }
             
         }
-        console.log("Saliendo");
     }
 
     getInput(){
