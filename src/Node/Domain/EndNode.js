@@ -8,7 +8,8 @@ class EndNode extends Node{
     }
 
     async run(edges,variables){
-        
+        console.log("EndNode");
+
     }
 
 }

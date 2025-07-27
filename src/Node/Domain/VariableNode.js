@@ -8,6 +8,7 @@ class VariableNode extends Node{
     }
 
     async run(edges,variables){
+        console.log("VariableNode");
         const value = this.#replaceVariableReference(this._data.value, variables)
         variables.set(this._data.name,value)
         return edges.target

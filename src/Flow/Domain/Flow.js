@@ -16,9 +16,14 @@ class Flow{
         this._nodePrototype = nodePrototype
         this._variables = new Map()
         this._variables.set('inter_input',{})
-        this._currentNodeId = "1"
+        this._currentNodeId = this.getFirstNode()
         this._visitedNodesId = new Set();
         this._ended = false;        
+    }
+
+    getFirstNode(){
+        const initNode = this._nodes.find((node) => node.type === 'init')
+        return initNode.id
     }
 
     getState(){

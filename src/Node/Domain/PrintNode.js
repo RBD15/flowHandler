@@ -13,6 +13,7 @@ class PrintNode extends Node{
   }
 
   async run(edges,variables){
+    console.log("PrintNode");
     const msg = this.#replaceVariableReference(this._data.code, variables)
     const input =  await this.#readInterface.ask(msg); 
     variables.set('inter_input',input)

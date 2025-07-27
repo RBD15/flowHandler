@@ -6,6 +6,7 @@ const InitNode = require('../../Node/Domain/InitNode');
 const EndNode = require('../../Node/Domain/EndNode');
 const PrintNode = require('../../Node/Domain/PrintNode');
 const ReadInterface = require('../../Tester/Domain/ReadInterface');
+const QueueNode = require('../../Node/Domain/QueueNode');
 
 class NodePrototype{
 

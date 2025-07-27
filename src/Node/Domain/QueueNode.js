@@ -1,6 +1,6 @@
-const Node = require('../Domain/Node')
+const Node = require('./Node')
 
-class InitNode extends Node{
+class QueueNode extends Node{
 
     constructor(id,data){
         super(id,data)
@@ -8,10 +8,10 @@ class InitNode extends Node{
     }
 
     async run(edges,variables){
-        console.log("InitNode");
+        console.log("QueueNode");
         return edges.target
     }
 
 }
 
-module.exports = InitNode
+module.exports = QueueNode

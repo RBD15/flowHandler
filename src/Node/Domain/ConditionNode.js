@@ -8,6 +8,7 @@ class ConditionNode extends Node{
     }
 
     async run(edges,variables){
+        console.log("ConditionNode");
         let result
         try {
             if(Array.isArray(edges)){
