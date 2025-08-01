@@ -1,18 +1,26 @@
 const { default: mongoose } = require("mongoose");
 
 const flowSchema = new mongoose.Schema({
-    id: {
+
+    name: {
         type: String,
         required: true,
-        unique: true
+    },
+    code: {
+        type: String,
+        required: true,
+    },
+    type:{
+        type: String,
+        required: true,
     },
     data: {
         type: Object,
         required: true 
     }
-}, { collection: 'flows' });
+});
 
 
-const flowModel = mongoose.model('Flow', flowSchema);
+const flowModel = mongoose.model('flow', flowSchema);
 
 module.exports = flowModel

@@ -4,7 +4,7 @@ class QueueNode extends Node{
 
     constructor(id,data){
         super(id,data)
-        this._type = 'init'
+        this._type = 'queue'
     }
 
     async run(edges,variables){

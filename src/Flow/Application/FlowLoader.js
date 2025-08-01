@@ -1,8 +1,8 @@
-const fs = require('fs');
+const fs = require('fs/promises');
 
-function loadFlow(fileDir){
+async function loadFlow(fileDir){
     try {
-        const data = fs.readFileSync(fileDir, 'utf8')
+        const data = await fs.readFile(fileDir, 'utf8')
         if (!data) {
             // console.error('Error al leer el archivo JSON:', err);
             return;

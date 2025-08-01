@@ -8,6 +8,7 @@ class Flow{
     _nodePrototype
     _variables
     _ended
+    _toAgent
 
     constructor(nodes,edges,settings,nodePrototype){
         this._edges = edges
@@ -18,7 +19,8 @@ class Flow{
         this._variables.set('inter_input',{})
         this._currentNodeId = this.getFirstNode()
         this._visitedNodesId = new Set();
-        this._ended = false;        
+        this._ended = false;   
+        this._toAgent = false;     
     }
 
     getFirstNode(){
@@ -34,7 +36,8 @@ class Flow{
             variables: new Map(this._variables),
             currentNodeId: this._currentNodeId,
             visitedNodesId: new Set(this._visitedNodesId),
-            ended: this._ended
+            ended: this._ended,
+            toAgent: this._toAgent
         } 
         return JSON.parse(JSON.stringify(state))
     }
@@ -59,7 +62,7 @@ class Flow{
 
         this._currentNodeId = state.currentNodeId
         this._ended = state.ended 
-
+        this._toAgent = state.toAgent
     }
 
     getNodes(){
@@ -73,7 +76,15 @@ class Flow{
     getSettings(){
         return this._settings
     }
+    
+    isEnded(){
+        return this._ended
+    }
 
+    isToAgent(){
+        return this._toAgent
+    }
+    
     async nextStep() {
         let stopped = false
 
@@ -85,10 +96,19 @@ class Flow{
         while(!stopped){
             
             const currentNode = this._nodes.find(node => node.id === this._currentNodeId);
+
             if(currentNode.type === 'end'){
                 stopped = true
                 this._currentNodeId = null
                 this._ended= true;
+                return
+            }
+
+            if(currentNode.type === 'queue'){
+                stopped = true
+                this._currentNodeId = null
+                this._ended= true
+                this._toAgent= true
                 return
             }
             
@@ -116,9 +136,6 @@ class Flow{
         return type === 'condition' || type === 'switch' || type === 'intent'
     }
 
-    isEnded(){
-        return this._ended
-    }
     
 }
 

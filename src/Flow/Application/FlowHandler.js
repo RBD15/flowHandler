@@ -20,6 +20,10 @@ class FlowHandler{
         return this.#flow.getState()
     }
 
+    isFlowEnded(){
+        return this.#flow.isEnded()
+    }
+
     async exec(){
         await this.#flow.nextStep()
         console.log(this.#flow.getInput());
