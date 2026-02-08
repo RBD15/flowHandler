@@ -9,6 +9,7 @@ class Flow{
     _variables
     _ended
     _toAgent
+    _transferQueue
 
     constructor(nodes,edges,settings,nodePrototype){
         this._edges = edges
@@ -20,7 +21,8 @@ class Flow{
         this._currentNodeId = this.getFirstNode()
         this._visitedNodesId = new Set();
         this._ended = false;   
-        this._toAgent = false;     
+        this._toAgent = false;  
+        this._transferQueue = null   
     }
 
     getFirstNode(){
@@ -37,7 +39,8 @@ class Flow{
             currentNodeId: this._currentNodeId,
             visitedNodesId: new Set(this._visitedNodesId),
             ended: this._ended,
-            toAgent: this._toAgent
+            toAgent: this._toAgent,
+            transferQueue: this._transferQueue
         } 
         return JSON.parse(JSON.stringify(state))
     }
@@ -63,6 +66,7 @@ class Flow{
         this._currentNodeId = state.currentNodeId
         this._ended = state.ended 
         this._toAgent = state.toAgent
+        this._transferQueue = state.transferQueue
     }
 
     getNodes(){
@@ -109,6 +113,7 @@ class Flow{
                 this._currentNodeId = null
                 this._ended= true
                 this._toAgent= true
+                this._transferQueue = currentNode.getQueueID()
                 return
             }
             

@@ -7,6 +7,10 @@ class QueueNode extends Node{
         this._type = 'queue'
     }
 
+    getQueueID(){
+        return this._data.queueID
+    }
+
     async run(edges,variables){
         console.log("QueueNode");
         return edges.target
