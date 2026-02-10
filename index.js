@@ -3,18 +3,23 @@ const NodePrototype = require("./src/Flow/Application/NodePrototype");
 const FlowCode = require("./src/Flow/Domain/FlowCode");
 const DbClient = require("./src/shared/DBClient");
 const FileClient = require("./src/shared/FileClient");
-const ReadInterface = require("./src/Tester/Domain/ReadInterface");
+const ConsoleWriteInterface = require("./src/Tester/Domain/ConsoleWriteInterface");
+require('dotenv').config();
 
 async function run(){
 
     let client
     try {
-        const uri = 'mongodb+srv://chat-real-time-v1:q8pWLlVeRQdJFlq8@testing.a0y02c4.mongodb.net/testv2'
-        client = new DbClient(uri)
-        await client.connect()
-        
-        const dirPath = '/src/data.json'
-        //client = new FileClient(dirPath)
+        const uri = process.env.DB_URI
+        if (uri) {
+            client = new DbClient(uri)
+            await client.connect()
+        } else {
+            console.log('DB_URI is missing. Using local file data instead.');
+            // const dirPath = '/src/data.json'
+            // client = new FileClient(dirPath)
+            return
+        }
     } catch (error) {
         console.log("Error",error);
     }
@@ -24,12 +29,13 @@ async function run(){
     
     try {
         let ended = false
-        const writeInterface = new ReadInterface()
-        const nodePrototype = new NodePrototype(writeInterface,true)
+        const debug= true
+        const writeInterface = new ConsoleWriteInterface()
+        const nodePrototype = new NodePrototype(writeInterface,debug)
         const flowCode = new FlowCode(flowData.nodes,flowData.edges,{},nodePrototype)
         
         const flowHandler = new FlowHandler(flowCode)
-        const initState = flowHandler.getFlowState()
+        // const initState = flowHandler.getFlowState()
     
         await flowHandler.exec()
         // flowCode.setInput(event.getMsg())
