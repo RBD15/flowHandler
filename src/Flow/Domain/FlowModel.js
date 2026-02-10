@@ -1,22 +1,25 @@
 const { default: mongoose } = require("mongoose");
+const { FLOW_TYPES_LIST, FLOW_TYPES } = require("../../models/flowEnums");
 
 const flowSchema = new mongoose.Schema({
 
-    name: {
-        type: String,
-        required: true,
+    name:{
+        type:String,
+        require:true
     },
-    code: {
-        type: String,
-        required: true,
+    code:{
+        type:Number,
+        require:true
     },
-    type:{
+    type: {
         type: String,
-        required: true,
+        require: true,
+        enum:FLOW_TYPES_LIST,
+        default: FLOW_TYPES.CHAT
     },
-    data: {
+    data:{
         type: Object,
-        required: true 
+        require:true
     }
 });
 

@@ -2,21 +2,31 @@ const Node = require('../Domain/Node')
 
 class PrintNode extends Node{
 
-  #readInterface
+  #writeInterface
+  #debug
   constructor(id,data){
     super(id,data)
     this._type = 'print'
+    this.#debug = false
   }
 
-  setReadInterface(readInterface){
-    this.#readInterface = readInterface
+  setDebug(debug){
+    this.#debug = debug
+  }
+
+  setWriteInterface(writeInterface){
+    this.#writeInterface = writeInterface
   }
 
   async run(edges,variables){
     console.log("PrintNode");
     const msg = this.#replaceVariableReference(this._data.code, variables)
-    const input =  await this.#readInterface.ask(msg); 
-    variables.set('inter_input',input)
+    if(this.#debug){
+      const input =  await this.#writeInterface.ask(msg); 
+      variables.set('inter_input',input)
+    }else{
+      await this.#writeInterface.ask(msg);
+    }
     return edges.target
   }
 

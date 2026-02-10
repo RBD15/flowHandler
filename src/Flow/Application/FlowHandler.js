@@ -1,19 +1,26 @@
-const NodePrototype = require("./NodePrototype")
-const Flow = require("./../Domain/Flow")
+// const NodePrototype = require("./NodePrototype")
+// const Flow = require("./../Domain/Flow")
 
 class FlowHandler{
-    #data
-    #nodePrototype
+
     #flow
-    constructor(data){
-        this.#data = data
-        this.#nodePrototype = new NodePrototype()
-        this.#flow = new Flow(this.#data.nodes,this.#data.edges,{},this.#nodePrototype)
+
+    constructor(flow){
+        this.#flow = flow
     }
 
-    setFlow(flowState){
-        this.#flow.setState(flowState)
-        return this
+    setFlow(flow){
+        this.#flow = flow
+    }
+
+    getCurrentInput(){
+        this.#flow.getInput()
+    }
+
+    setInput(input){
+        if(!this.#flow)
+            throw new Error("Flow isnt setup");
+        this.#flow.setInput(input)
     }
 
     getFlowState(){
@@ -25,6 +32,9 @@ class FlowHandler{
     }
 
     async exec(){
+        if(!this.#flow)
+            throw new Error("Flow wasnt setup");
+
         await this.#flow.nextStep()
         console.log(this.#flow.getInput());
         return

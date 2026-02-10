@@ -27,8 +27,9 @@ class DbClient {
         console.log('Conexión cerrada');
     }
 
-    async getData(idFlow="1000"){
+    async getData(idFlow="2000"){
         const flow = await flowModel.find({code:idFlow});
+        console.log("Flow from DB",flow);
         return flow[0].data
     }
 }

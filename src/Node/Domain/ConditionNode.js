@@ -12,9 +12,10 @@ class ConditionNode extends Node{
         let result
         try {
             if(Array.isArray(edges)){
-                const value = this.#replaceVariableReference(this._data.name, variables)
+                const value = this.#resolveValue(this._data.name, variables)
+                const compareTo = this.#resolveValue(this._data.value, variables)
                 result = eval(
-                    `${value}${this._data.condition}${this._data.value}`
+                    `${value}${this._data.condition}${compareTo}`
                 );                
                 if(result){
                     result = 'THEN'
@@ -35,6 +36,16 @@ class ConditionNode extends Node{
         return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
           return variables.get(key) || '';
         });
+    }
+
+    #resolveValue(input, variables) {
+        if(input === undefined || input === null) return ''
+        if(typeof input !== 'string') return input
+        if(input.includes('#{')){
+            return this.#replaceVariableReference(input, variables)
+        }
+        const stored = variables.get(input)
+        return stored !== undefined ? stored : input
     }
 }
 

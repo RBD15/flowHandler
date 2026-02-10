@@ -5,20 +5,22 @@ const ConditionNode = require('../../Node/Domain/ConditionNode');
 const InitNode = require('../../Node/Domain/InitNode');
 const EndNode = require('../../Node/Domain/EndNode');
 const PrintNode = require('../../Node/Domain/PrintNode');
-const ReadInterface = require('../../Tester/Domain/ReadInterface');
 const QueueNode = require('../../Node/Domain/QueueNode');
+const ApiNode = require('../../Node/Domain/ApiNode');
+const CaseNode = require('../../Node/Domain/CaseNode');
 
 class NodePrototype{
 
     #nodes
     #nodeTypes
-    #readInterface
-    constructor(){
+    #writeInterface
+    #debug
+    constructor(writeInterface,debug=false){
         this.#nodes = new Set()
         this.#nodeTypes = new Map()
+        this.#writeInterface = writeInterface
         this.#init()
-        //TODO: PrintNode needs a readInterface
-        this.#readInterface = new ReadInterface()
+        this.#debug = debug
     }
 
     #init(){
@@ -84,8 +86,10 @@ class NodePrototype{
         const currentType = this.#nodeTypes.get(type)
         if(currentType){
             interNode = eval(`new ${currentType}(${id},${JSON.stringify(data)})`);
-            if(currentType === 'PrintNode')
-                interNode.setReadInterface(this.#readInterface)
+            if(currentType === 'PrintNode'){
+                interNode.setDebug(this.#debug)
+                interNode.setWriteInterface(this.#writeInterface)
+            }
             return interNode
         }else{
             throw new Error('Type wasnt valid')

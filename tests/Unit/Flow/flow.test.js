@@ -1,4 +1,5 @@
-const Flow = require('../../../src/Flow/Domain/Flow')
+const FlowCode = require('../../../src/Flow/Domain/FlowCode')
+const NodePrototype = require('../../../src/Flow/Application/NodePrototype')
 describe('Flow tests', () => {
 
     let data
@@ -54,6 +55,7 @@ describe('Flow tests', () => {
                         "thenConnection": true,
                         "elseConnection": true,
                         "name": "age",
+                        "condition": ">",
                         "value": "20"
                     },
                     "measured": {
@@ -65,7 +67,7 @@ describe('Flow tests', () => {
                 },
                 {
                     "id": "4",
-                    "type": "result",
+                    "type": "end",
                     "position": {
                         "x": 735,
                         "y": 180
@@ -80,7 +82,7 @@ describe('Flow tests', () => {
                 },
                 {
                     "id": "5",
-                    "type": "result",
+                    "type": "end",
                     "position": {
                         "x": 765,
                         "y": 270
@@ -146,7 +148,8 @@ describe('Flow tests', () => {
                 }
             ]
         }
-        flow = new Flow(data.nodes,data.edges,{})
+        const nodePrototype = new NodePrototype()
+        flow = new FlowCode(data.nodes,data.edges,{},nodePrototype)
     })
 
     test('Step', () => {
