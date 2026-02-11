@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const VariableNode = require('../../Node/Domain/VariableNode');
 const ConditionNode = require('../../Node/Domain/ConditionNode');
 const InitNode = require('../../Node/Domain/InitNode');
@@ -15,15 +13,31 @@ class NodePrototype{
     #nodeTypes
     #writeInterface
     #debug
-    constructor(writeInterface,debug=false){
+    #nodeClassList
+    #nodeClassMap
+    constructor(writeInterface,debug=false,nodeClasses=null){
         this.#nodes = new Set()
         this.#nodeTypes = new Map()
         this.#writeInterface = writeInterface
+        this.#nodeClassList = nodeClasses
+        this.#nodeClassMap = new Map()
         this.#init()
         this.#debug = debug
     }
 
     #init(){
+        if (Array.isArray(this.#nodeClassList) && this.#nodeClassList.length > 0) {
+            const names = this.#nodeClassList.map((cls) => cls?.name).filter(Boolean)
+            this.#recordNodesType(names)
+            this.#nodeClassList.forEach((cls) => {
+                if (cls?.name && cls.name !== 'Node') {
+                    this.#nodeClassMap.set(this.#removeSubString(cls.name,'Node',true), cls)
+                }
+            })
+            return
+        }
+        const fs = require('fs');
+        const path = require('path');
         // Ruta del directorio que deseas analizar
         const directoryPath = path.resolve(__dirname)+'../../../Node/Domain';        
         const nodeClasses = this.#getNodeClasses(directoryPath);  
@@ -44,6 +58,8 @@ class NodePrototype{
     // Función principal para analizar archivos en un directorio
     #getNodeClasses(directoryPath) {   
         try {
+            const fs = require('fs');
+            const path = require('path');
             const files = fs.readdirSync(directoryPath)            
             return files.map((file) => {
                 const fullPath = path.join(directoryPath, file);                
@@ -83,6 +99,18 @@ class NodePrototype{
     getNodeByType(node){
         let interNode
         const {type,id,data} = node
+        if (this.#nodeClassMap.size > 0) {
+            const NodeClass = this.#nodeClassMap.get(type)
+            if (!NodeClass) {
+                throw new Error('Type wasnt valid')
+            }
+            interNode = new NodeClass(id,data)
+            if(NodeClass.name === 'PrintNode'){
+                interNode.setDebug(this.#debug)
+                interNode.setWriteInterface(this.#writeInterface)
+            }
+            return interNode
+        }
         const currentType = this.#nodeTypes.get(type)
         if(currentType){
             interNode = eval(`new ${currentType}(${id},${JSON.stringify(data)})`);
