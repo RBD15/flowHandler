@@ -1,6 +1,7 @@
 
 const Node = require('./Node')
 const ApiClient = require('./ApiClient')
+const VariableResolver = require('./VariableResolver')
 
 class ApiNode extends Node{
 
@@ -14,11 +15,11 @@ class ApiNode extends Node{
         console.log("ApiNode");
         try{
             const method = (this._data.method || 'GET').toLowerCase()
-            let url = this._replaceVariableReference(this._data.url || '', variables)
+            let url = VariableResolver.replaceReferences(this._data.url || '', variables)
             let headers = {}
             if(this._data.headers){
                 // headers expected as JSON string or object; replace variables inside the string
-                const rawHeaders = this._replaceVariableReference(this._data.headers, variables)
+                const rawHeaders = VariableResolver.replaceReferences(this._data.headers, variables)
                 try{
                     headers = typeof rawHeaders === 'string' ? JSON.parse(rawHeaders) : rawHeaders
                 }catch(e){
@@ -28,7 +29,7 @@ class ApiNode extends Node{
 
             let body = null
             if(this._data.body){
-                const rawBody = this._replaceVariableReference(this._data.body, variables)
+                const rawBody = VariableResolver.replaceReferences(this._data.body, variables)
                 // try parse JSON, fallback to raw string
                 try{
                     body = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody
@@ -41,11 +42,11 @@ class ApiNode extends Node{
 
             const responseVar = this._data.responseVar
             if(responseVar){
-                // store response data as JSON string
-                try{
-                    variables.set(responseVar, JSON.stringify(response.data))
-                }catch(e){
-                    variables.set(responseVar, String(response.data))
+                const responseData = response?.data
+                if(typeof responseData === 'object' && responseData !== null){
+                    variables.set(responseVar, JSON.stringify(responseData))
+                }else{
+                    variables.set(responseVar, responseData)
                 }
             }
 
@@ -53,14 +54,6 @@ class ApiNode extends Node{
         }catch(err){
             throw new Error(`ApiNode execution error: ${err}`)
         }
-    }
-
-    _replaceVariableReference(inputString, variables){
-        if(!inputString) return inputString
-        if(typeof inputString !== 'string') return inputString
-        return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
-            return variables.get(key) || ''
-        })
     }
 
 }

@@ -1,4 +1,5 @@
 const Node = require('../Domain/Node')
+const VariableResolver = require('./VariableResolver')
 
 class VariableNode extends Node{
 
@@ -9,15 +10,9 @@ class VariableNode extends Node{
 
     async run(edges,variables){
         console.log("VariableNode");
-        const value = this.#replaceVariableReference(this._data.value, variables)
+      const value = VariableResolver.replaceReferences(this._data.value, variables)
         variables.set(this._data.name,value)
         return edges.target
-    }
-
-    #replaceVariableReference(inputString, variables) {
-        return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
-          return variables.get(key) || '';
-        });
     }
 
 }

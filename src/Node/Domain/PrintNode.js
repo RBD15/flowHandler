@@ -1,4 +1,5 @@
 const Node = require('../Domain/Node')
+const VariableResolver = require('./VariableResolver')
 
 class PrintNode extends Node{
 
@@ -20,7 +21,7 @@ class PrintNode extends Node{
 
   async run(edges,variables){
     console.log("PrintNode");
-    const msg = this.#replaceVariableReference(this._data.code, variables)
+    const msg = VariableResolver.replaceReferences(this._data.code, variables)
     if(this.#debug){
       const input =  await this.#writeInterface.ask(msg); 
       variables.set('inter_input',input)
@@ -28,12 +29,6 @@ class PrintNode extends Node{
       await this.#writeInterface.ask(msg);
     }
     return edges.target
-  }
-
-  #replaceVariableReference(inputString, variables) {
-    return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
-      return variables.get(key) || '';
-    });
   }
       
 }

@@ -1,4 +1,5 @@
 const Node = require('./Node')
+const VariableResolver = require('./VariableResolver')
 
 class CaseNode extends Node{
 
@@ -16,7 +17,7 @@ class CaseNode extends Node{
             const inputVarName = this._data.inputVar
             let value = ''
             if(typeof inputVarName === 'string' && inputVarName.includes('#{')){
-                value = this._replaceVariableReference(inputVarName, variables)
+                value = VariableResolver.replaceReferences(inputVarName, variables)
             }else{
                 value = variables.get(inputVarName) || ''
             }
@@ -32,14 +33,6 @@ class CaseNode extends Node{
         }catch(err){
             throw new Error(`CaseNode execution error: ${err}`)
         }
-    }
-
-    _replaceVariableReference(inputString, variables){
-        if(!inputString) return ''
-        if(typeof inputString !== 'string') return ''
-        return inputString.replace(/#\{(\w+)\}/g, (match, key) => {
-            return variables.get(key) || ''
-        })
     }
 
 }

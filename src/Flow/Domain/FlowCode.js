@@ -10,6 +10,7 @@ class FlowCode{
     _ended
     _toAgent
     _transferQueue
+    _onNodeVisit
 
     constructor(nodes,edges,settings,nodePrototype){
         this._edges = edges
@@ -23,6 +24,7 @@ class FlowCode{
         this._ended = false;   
         this._toAgent = false;  
         this._transferQueue = null   
+        this._onNodeVisit = null
     }
 
     getFirstNode(){
@@ -80,6 +82,10 @@ class FlowCode{
         this._transferQueue = state.transferQueue
     }
 
+    setOnNodeVisit(callback){
+        this._onNodeVisit = callback
+    }
+
     getNodes(){
         return this._nodes
     }
@@ -111,6 +117,14 @@ class FlowCode{
             while(!stopped){
                 
                 const currentNode = this._nodes.find(node => node.id === this._currentNodeId);
+
+                if (this._onNodeVisit) {
+                    try {
+                        this._onNodeVisit(currentNode)
+                    } catch (e) {
+                        // ignore callback errors
+                    }
+                }
     
                 if(currentNode.type === 'end'){
                     stopped = true
