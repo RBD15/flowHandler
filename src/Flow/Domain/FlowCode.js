@@ -40,19 +40,45 @@ class FlowCode{
         return this._variables
     }
 
+    #cloneValue(value){
+        if (typeof structuredClone === 'function') {
+            return structuredClone(value)
+        }
+
+        if (value instanceof Map) {
+            const clonedMap = new Map()
+            for (const [key, mapValue] of value.entries()) {
+                clonedMap.set(key, cloneValue(mapValue))
+            }
+            return clonedMap
+        }
+
+        if (value instanceof Set) {
+            return new Set(Array.from(value, (item) => cloneValue(item)))
+        }
+
+        if (Array.isArray(value)) {
+            return value.map((item) => cloneValue(item))
+        }
+
+        if (value && typeof value === 'object') {
+            return JSON.parse(JSON.stringify(value))
+        }
+        return value
+    }
+
     getState(){
-        const state = {
-            edges: this._edges,
-            nodes: this._nodes,
-            settings: this._settings,
-            variables: new Map(this._variables),
+        return {
+            edges: this.#cloneValue(this._edges),
+            nodes: this.#cloneValue(this._nodes),
+            settings: this.#cloneValue(this._settings),
+            variables: this.#cloneValue(this._variables),
             currentNodeId: this._currentNodeId,
-            visitedNodesId: new Set(this._visitedNodesId),
+            visitedNodesId: this.#cloneValue(this._visitedNodesId),
             ended: this._ended,
             toAgent: this._toAgent,
-            transferQueue: this._transferQueue
-        } 
-        return JSON.parse(JSON.stringify(state))
+            transferQueue: this.#cloneValue(this._transferQueue)
+        }
     }
 
     setState(state){
@@ -62,18 +88,22 @@ class FlowCode{
         // console.log("Setting state",state);
         // console.log("Setting state variables",this._variables);
         this._variables = new Map()
-        if (state.variables && Object.keys(state.variables).length > 0){
-            for (const key in state.variables) {
-                if (state.variables.hasOwnProperty(key)) {
-                    this._variables.set(key, state.variables[key]);
-                }
+        if (state.variables instanceof Map) {
+            this._variables = new Map(state.variables)
+        } else if (state.variables && typeof state.variables === 'object') {
+            for (const key of Object.keys(state.variables)) {
+                this._variables.set(key, state.variables[key])
             }
         }
 
-        if (state.visitedNodesId.size){
+        if (state.visitedNodesId instanceof Set) {
+            this._visitedNodesId = new Set(state.visitedNodesId)
+        } else if (Array.isArray(state.visitedNodesId)) {
+            this._visitedNodesId = new Set(state.visitedNodesId)
+        } else if (state.visitedNodesId && typeof state.visitedNodesId === 'object') {
+            this._visitedNodesId = new Set(Object.values(state.visitedNodesId))
+        } else {
             this._visitedNodesId = new Set()
-        }else{
-            this._visitedNodesId = new Set(Object.values(state.visitedNodesId));
         }
 
         this._currentNodeId = state.currentNodeId
@@ -149,12 +179,15 @@ class FlowCode{
                 if(currentNode.type === 'print')
                     stopped = true
                 
+                console.log("Variables previous execution",this._variables);
+                
                 if(this._isDecisionNode(currentNode.type)){
                     this._currentNodeId = await tempNode.run(nextEdges,this._variables)
                 }else{
                     this._currentNodeId = await tempNode.run(nextEdges[0],this._variables)
                 }
-                
+                console.log("Variables post execution",this._variables);
+
             }
             
         } catch (error){
