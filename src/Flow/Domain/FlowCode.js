@@ -192,6 +192,7 @@ class FlowCode{
             
         } catch (error){
             console.log("Error runing nextStep",error);
+            throw error
         }
     }
 
@@ -200,7 +201,7 @@ class FlowCode{
     }
 
     _isDecisionNode(type){
-        return type === 'condition' || type === 'switch' || type === 'intent' || type === 'case'
+        return type === 'condition' || type === 'switch' || type === 'intent' || type === 'case' || type === 'menu'
     }
 
     

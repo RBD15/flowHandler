@@ -11,6 +11,8 @@ import InitNode from './Node/Domain/InitNode.js';
 import PrintNode from './Node/Domain/PrintNode.js';
 import QueueNode from './Node/Domain/QueueNode.js';
 import VariableNode from './Node/Domain/VariableNode.js';
+import MenuNode from './Node/Domain/MenuNode.js';
+import TalkNode from './Node/Domain/TalkNode.js';
 
 const pkg = {
   FlowHandler,
@@ -26,6 +28,8 @@ const pkg = {
   PrintNode,
   QueueNode,
   VariableNode,
+  MenuNode,
+  TalkNode,
 };
 
 export {
@@ -42,6 +46,8 @@ export {
   PrintNode,
   QueueNode,
   VariableNode,
+  MenuNode,
+  TalkNode,
 };
 
 export default pkg;

@@ -16,5 +16,7 @@ export const InitNode = cjs.InitNode;
 export const PrintNode = cjs.PrintNode;
 export const QueueNode = cjs.QueueNode;
 export const VariableNode = cjs.VariableNode;
+export const MenuNode = cjs.MenuNode;
+export const TalkNode = cjs.TalkNode;
 
 export default cjs;

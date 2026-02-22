@@ -109,6 +109,12 @@ class NodePrototype{
                 interNode.setDebug(this.#debug)
                 interNode.setWriteInterface(this.#writeInterface)
             }
+            if(NodeClass.name === 'TalkNode'){
+                interNode.setWriteInterface(this.#writeInterface)
+            }
+            if(NodeClass.name === 'MenuNode'){
+                interNode.setWriteInterface(this.#writeInterface)
+            }
             return interNode
         }
         const currentType = this.#nodeTypes.get(type)
@@ -116,6 +122,12 @@ class NodePrototype{
             interNode = eval(`new ${currentType}(${id},${JSON.stringify(data)})`);
             if(currentType === 'PrintNode'){
                 interNode.setDebug(this.#debug)
+                interNode.setWriteInterface(this.#writeInterface)
+            }
+            if(currentType === 'TalkNode'){
+                interNode.setWriteInterface(this.#writeInterface)
+            }
+            if(currentType === 'MenuNode'){
                 interNode.setWriteInterface(this.#writeInterface)
             }
             return interNode

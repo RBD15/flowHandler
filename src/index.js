@@ -11,6 +11,8 @@ const InitNode = require('./Node/Domain/InitNode');
 const PrintNode = require('./Node/Domain/PrintNode');
 const QueueNode = require('./Node/Domain/QueueNode');
 const VariableNode = require('./Node/Domain/VariableNode');
+const MenuNode = require('./Node/Domain/MenuNode');
+const TalkNode = require('./Node/Domain/TalkNode');
 
 module.exports = {
   FlowHandler,
@@ -26,4 +28,6 @@ module.exports = {
   PrintNode,
   QueueNode,
   VariableNode,
+  MenuNode,
+  TalkNode,
 };

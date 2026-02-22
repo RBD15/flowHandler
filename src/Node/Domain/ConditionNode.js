@@ -10,27 +10,26 @@ class ConditionNode extends Node{
 
     async run(edges,variables){
         console.log("ConditionNode");
-        let result
         try {
             if(Array.isArray(edges)){
                 const value = VariableResolver.resolveValue(this._data.name, variables)
                 const compareTo = VariableResolver.resolveValue(this._data.value, variables)
-                result = eval(
+                const result = eval(
                     `${value}${this._data.condition}${compareTo}`
-                );                
-                if(result){
-                    result = 'THEN'
-                }else{
-                    result = 'ELSE'
-                }
-                const nextEdge = edges.find((edge)=> edge.label === result)
-                return nextEdge.target
+                );
+                return this.matchingEdgeRoute(edges, result)
             }else{
                 throw new Error(`Bad Edge Format for ${edges}`);
             }
         } catch (error) {
             throw new Error(`Condition variable wasnt founded ${error}`);
         }
+    }
+
+    matchingEdgeRoute(edges, result){
+        const routeLabel = result ? 'THEN' : 'ELSE'
+        const nextEdge = edges.find((edge)=> edge.label === routeLabel)
+        return nextEdge.target
     }
 }
 
