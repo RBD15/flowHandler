@@ -2,3 +2,4 @@ node_modules
 backlog
 .env
 .tmp.*
+*.tgz

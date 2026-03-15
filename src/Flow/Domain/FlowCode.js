@@ -139,6 +139,11 @@ class FlowCode{
     async nextStep() {
         let stopped = false
         try {
+            if (!this._currentNodeId) {
+                this._ended = true
+                return
+            }
+
             if (this._visitedNodesId.has(this._currentNodeId)) {
                 console.log("Se detectó un ciclo, deteniendo la ejecución.");
                 return;
@@ -147,6 +152,13 @@ class FlowCode{
             while(!stopped){
                 
                 const currentNode = this._nodes.find(node => node.id === this._currentNodeId);
+
+                if (!currentNode) {
+                    console.log("Current node was not found, ending flow execution", this._currentNodeId)
+                    this._currentNodeId = null
+                    this._ended = true
+                    return
+                }
 
                 if (this._onNodeVisit) {
                     try {
@@ -168,7 +180,7 @@ class FlowCode{
                     this._currentNodeId = null
                     this._ended= true
                     this._toAgent= true
-                    this._transferQueue = currentNode.getQueueID()
+                    this._transferQueue = currentNode.data.queueID
                     return
                 }
                 

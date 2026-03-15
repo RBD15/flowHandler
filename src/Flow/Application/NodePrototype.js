@@ -27,13 +27,22 @@ class NodePrototype{
 
     #init(){
         if (Array.isArray(this.#nodeClassList) && this.#nodeClassList.length > 0) {
-            const names = this.#nodeClassList.map((cls) => cls?.name).filter(Boolean)
-            this.#recordNodesType(names)
-            this.#nodeClassList.forEach((cls) => {
+            const names = []
+            this.#nodeClassList.forEach((entry) => {
+                if (entry && typeof entry === 'object' && entry.type && entry.NodeClass) {
+                    const normalizedType = String(entry.type).toLowerCase()
+                    this.#nodeClassMap.set(normalizedType, entry.NodeClass)
+                    names.push(entry.NodeClass?.name || `${entry.type}Node`)
+                    return
+                }
+
+                const cls = entry
                 if (cls?.name && cls.name !== 'Node') {
                     this.#nodeClassMap.set(this.#removeSubString(cls.name,'Node',true), cls)
+                    names.push(cls.name)
                 }
             })
+            this.#recordNodesType(names)
             return
         }
         const fs = require('fs');
@@ -100,19 +109,20 @@ class NodePrototype{
         let interNode
         const {type,id,data} = node
         if (this.#nodeClassMap.size > 0) {
-            const NodeClass = this.#nodeClassMap.get(type)
+            const nodeType = String(type || '').toLowerCase()
+            const NodeClass = this.#nodeClassMap.get(nodeType)
             if (!NodeClass) {
                 throw new Error('Type wasnt valid')
             }
             interNode = new NodeClass(id,data)
-            if(NodeClass.name === 'PrintNode'){
+            if(nodeType === 'print'){
                 interNode.setDebug(this.#debug)
                 interNode.setWriteInterface(this.#writeInterface)
             }
-            if(NodeClass.name === 'TalkNode'){
+            if(nodeType === 'talk'){
                 interNode.setWriteInterface(this.#writeInterface)
             }
-            if(NodeClass.name === 'MenuNode'){
+            if(nodeType === 'menu'){
                 interNode.setWriteInterface(this.#writeInterface)
             }
             return interNode
