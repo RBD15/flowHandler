@@ -1,6 +1,8 @@
 class FlowCode{
 
     _nodes
+    _nodesById
+    _firstNodeId
     _edges
     _settings
     _currentNodeId
@@ -15,6 +17,7 @@ class FlowCode{
     constructor(nodes,edges,settings,nodePrototype){
         this._edges = edges
         this._nodes = nodes
+        this.#rebuildNodesIndex()
         this._settings = settings
         this._nodePrototype = nodePrototype
         this._variables = new Map()
@@ -27,9 +30,24 @@ class FlowCode{
         this._onNodeVisit = null
     }
 
+    #rebuildNodesIndex() {
+        this._nodesById = new Map()
+        this._firstNodeId = null
+
+        for (const node of this._nodes || []) {
+            this._nodesById.set(node.id, node)
+            if (!this._firstNodeId && node.type === 'init') {
+                this._firstNodeId = node.id
+            }
+        }
+    }
+
+    #getNodeById(nodeId) {
+        return this._nodesById.get(nodeId)
+    }
+
     getFirstNode(){
-        const initNode = this._nodes.find((node) => node.type === 'init')
-        return initNode.id
+        return this._firstNodeId
     }
 
     setInput(input){
@@ -40,40 +58,40 @@ class FlowCode{
         return this._variables
     }
 
-    #cloneValue(value){
-        if (typeof structuredClone === 'function') {
-            return structuredClone(value)
-        }
-
+    #cloneValue(value) {
         if (value instanceof Map) {
-            const clonedMap = new Map()
+            const obj = {}
             for (const [key, mapValue] of value.entries()) {
-                clonedMap.set(key, cloneValue(mapValue))
+                obj[key] = this.#cloneValue(mapValue)
             }
-            return clonedMap
+            return obj
         }
 
         if (value instanceof Set) {
-            return new Set(Array.from(value, (item) => cloneValue(item)))
+            return Array.from(value).map(item => this.#cloneValue(item))
         }
 
         if (Array.isArray(value)) {
-            return value.map((item) => cloneValue(item))
+            return value.map((item) => this.#cloneValue(item))
         }
 
         if (value && typeof value === 'object') {
-            return JSON.parse(JSON.stringify(value))
+            try {
+                return JSON.parse(JSON.stringify(value))
+            } catch (e) {
+                return value
+            }
         }
         return value
     }
 
-    getState(){
+    getState() {
         return {
-            edges: this.#cloneValue(this._edges),
             nodes: this.#cloneValue(this._nodes),
+            edges: this.#cloneValue(this._edges),
             settings: this.#cloneValue(this._settings),
-            variables: this.#cloneValue(this._variables),
             currentNodeId: this._currentNodeId,
+            variables: this.#cloneValue(this._variables),
             visitedNodesId: this.#cloneValue(this._visitedNodesId),
             ended: this._ended,
             toAgent: this._toAgent,
@@ -81,12 +99,12 @@ class FlowCode{
         }
     }
 
-    setState(state){
-        this._edges = state.edges
-        this._nodes = state.nodes
-        this._settings = state.settings
-        // console.log("Setting state",state);
-        // console.log("Setting state variables",this._variables);
+    setState(state) {
+        if (state.edges) this._edges = state.edges
+        if (state.nodes) this._nodes = state.nodes
+        this.#rebuildNodesIndex()
+        if (state.settings) this._settings = state.settings
+        
         this._variables = new Map()
         if (state.variables instanceof Map) {
             this._variables = new Map(state.variables)
@@ -107,7 +125,7 @@ class FlowCode{
         }
 
         this._currentNodeId = state.currentNodeId
-        this._ended = state.ended 
+        this._ended = state.ended
         this._toAgent = state.toAgent
         this._transferQueue = state.transferQueue
     }
@@ -151,7 +169,7 @@ class FlowCode{
         
             while(!stopped){
                 
-                const currentNode = this._nodes.find(node => node.id === this._currentNodeId);
+                const currentNode = this.#getNodeById(this._currentNodeId);
 
                 if (!currentNode) {
                     console.log("Current node was not found, ending flow execution", this._currentNodeId)
@@ -191,14 +209,14 @@ class FlowCode{
                 if(currentNode.type === 'print')
                     stopped = true
                 
-                console.log("Variables previous execution",this._variables);
+                // console.log("Variables previous execution",this._variables);
                 
                 if(this._isDecisionNode(currentNode.type)){
                     this._currentNodeId = await tempNode.run(nextEdges,this._variables)
                 }else{
                     this._currentNodeId = await tempNode.run(nextEdges[0],this._variables)
                 }
-                console.log("Variables post execution",this._variables);
+                // console.log("Variables post execution",this._variables);
 
             }
             
