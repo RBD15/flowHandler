@@ -2,6 +2,7 @@ class FlowCode{
 
     _nodes
     _nodesById
+    _edgesBySource
     _firstNodeId
     _edges
     _settings
@@ -15,11 +16,22 @@ class FlowCode{
     _onNodeVisit
 
     constructor(nodes,edges,settings,nodePrototype){
-        this._edges = edges
-        this._nodes = nodes
-        this.#rebuildNodesIndex()
-        this._settings = settings
         this._nodePrototype = nodePrototype
+        
+        if (nodes && nodes._isTemplate) {
+            this._nodes = nodes.nodes
+            this._edges = nodes.edges
+            this._settings = nodes.settings
+            this._nodesById = nodes.nodesById
+            this._edgesBySource = nodes.edgesBySource
+            this._firstNodeId = nodes.firstNodeId
+        } else {
+            this._edges = edges
+            this._nodes = nodes
+            this._settings = settings
+            this.#rebuildNodesIndex()
+        }
+
         this._variables = new Map()
         this._variables.set('inter_input',{})
         this._currentNodeId = this.getFirstNode()
@@ -30,8 +42,22 @@ class FlowCode{
         this._onNodeVisit = null
     }
 
+    static createTemplate(nodes, edges, settings) {
+        const temp = new FlowCode(nodes, edges, settings, null)
+        return {
+            _isTemplate: true,
+            nodes: temp._nodes,
+            edges: temp._edges,
+            settings: temp._settings,
+            nodesById: temp._nodesById,
+            edgesBySource: temp._edgesBySource,
+            firstNodeId: temp._firstNodeId
+        }
+    }
+
     #rebuildNodesIndex() {
         this._nodesById = new Map()
+        this._edgesBySource = new Map()
         this._firstNodeId = null
 
         for (const node of this._nodes || []) {
@@ -40,10 +66,21 @@ class FlowCode{
                 this._firstNodeId = node.id
             }
         }
+        
+        for (const edge of this._edges || []) {
+            if (!this._edgesBySource.has(edge.source)) {
+                this._edgesBySource.set(edge.source, [])
+            }
+            this._edgesBySource.get(edge.source).push(edge)
+        }
     }
 
     #getNodeById(nodeId) {
         return this._nodesById.get(nodeId)
+    }
+
+    #getEdgesBySource(nodeId) {
+        return this._edgesBySource.get(nodeId) || []
     }
 
     getFirstNode(){
@@ -87,9 +124,9 @@ class FlowCode{
 
     getState() {
         return {
-            nodes: this.#cloneValue(this._nodes),
-            edges: this.#cloneValue(this._edges),
-            settings: this.#cloneValue(this._settings),
+            nodes: this._nodes, // No retornamos deepClone momentaneamente por bug en chatbot
+            edges: this._edges, // No retornamos deepClone momentaneamente por bug en chatbot
+            settings: this._settings,
             currentNodeId: this._currentNodeId,
             variables: this.#cloneValue(this._variables),
             visitedNodesId: this.#cloneValue(this._visitedNodesId),
@@ -202,13 +239,13 @@ class FlowCode{
                     return
                 }
                 
-                const nextEdges = this._edges.filter(edge => edge.source === this._currentNodeId);
+                const nextEdges = this.#getEdgesBySource(this._currentNodeId);
                 this._visitedNodesId.add(this._currentNodeId);
                 const tempNode = this._nodePrototype.getNodeByType(currentNode)
-    
+                
                 if(currentNode.type === 'print')
                     stopped = true
-                
+
                 // console.log("Variables previous execution",this._variables);
                 
                 if(this._isDecisionNode(currentNode.type)){

@@ -128,6 +128,10 @@ class MenuNode extends Node {
                 throw new Error(`Bad Edge Format for ${edges}`)
             }
 
+            if(!edges.filter(edge => edge?.label?.toUpperCase() === 'END')[0]){
+                throw new Error('No END route configured for MenuNode')
+            }
+
             let selectedOption = this._resolveInputValue(variables)
 
             const hasInteractiveMenu =
