@@ -128,10 +128,6 @@ class MenuNode extends Node {
                 throw new Error(`Bad Edge Format for ${edges}`)
             }
 
-            if(!edges.filter(edge => edge?.label?.toUpperCase() === 'END')[0]){
-                throw new Error('No END route configured for MenuNode')
-            }
-
             let selectedOption = this._resolveInputValue(variables)
 
             const hasInteractiveMenu =
@@ -167,13 +163,7 @@ class MenuNode extends Node {
             const retries = this._getRetries(variables)
 
             if (retries >= this.getMaxRetries()) {
-                if (this.hasEdge(edges, 'END')) {
-                    return this.matchingEdgeRoute(edges, 'END')
-                }
-                if (this.hasEdge(edges, 'INVALID')) {
-                    return this.matchingEdgeRoute(edges, 'INVALID')
-                }
-                throw new Error('No menu input and no END/INVALID route configured')
+                return this.matchingEdgeRoute(edges, 'END')
             }
 
             if (this.hasEdge(edges, 'INVALID')) {
