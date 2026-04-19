@@ -21,11 +21,11 @@ class PrintNode extends Node{
 
   async run(edges,variables){
     console.log("PrintNode");
-    const msg = VariableResolver.replaceReferences(this._data.code, variables)
-    if(this.#debug){
+    const msg = VariableResolver.replaceReferences(this._data.content || this._data.code || '', variables)
+    if(this.#debug && this.#writeInterface){
       const input =  await this.#writeInterface.ask(msg); 
       variables.set('inter_input',input)
-    }else{
+    }else if(this.#writeInterface){
       await this.#writeInterface.ask(msg);
     }
     return edges.target

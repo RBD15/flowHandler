@@ -11,14 +11,24 @@ class DbClient {
         try {
             await mongoose.connect(this.#uri, {
                  authSource: "admin",
-                //  user: "root",
-                //  pass: "12345678",
+                 serverSelectionTimeoutMS: 5000,
+                 connectTimeoutMS: 10000,
                  useNewUrlParser: true,
                  useUnifiedTopology: true
              });
-            console.log('Conexión exitosa a MongoDB en localhost');
+
+            mongoose.connection.on('error', (err) => {
+                console.error('MongoDB connection error:', err);
+            });
+
+            mongoose.connection.on('disconnected', () => {
+                console.warn('MongoDB disconnected');
+            });
+
+            console.log('Successfully connected to MongoDB');
         } catch (error) {
-            console.error('Error al conectarse o al obtener datos:', error);
+            console.error('Failed to connect to MongoDB:', error);
+            throw error; // Rethrow to allow bootstrap fallback
         }
     }
 

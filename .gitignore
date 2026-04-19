@@ -3,3 +3,7 @@ backlog
 .env
 .tmp.*
 *.tgz
+/FlowHandlers
+
+*coverage*
+*.log

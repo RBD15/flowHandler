@@ -14,9 +14,34 @@ class ConditionNode extends Node{
             if(Array.isArray(edges)){
                 const value = VariableResolver.resolveValue(this._data.name, variables)
                 const compareTo = VariableResolver.resolveValue(this._data.value, variables)
-                const result = eval(
-                    `${value}${this._data.condition}${compareTo}`
-                );
+                
+                let result = false
+                const operator = this._data.condition
+                
+                // Functional replacement for eval
+                switch (operator) {
+                    case '===':
+                    case '==':
+                        result = value == compareTo; break;
+                    case '!==':
+                    case '!=':
+                        result = value != compareTo; break;
+                    case '>':
+                        result = value > compareTo; break;
+                    case '<':
+                        result = value < compareTo; break;
+                    case '>=':
+                        result = value >= compareTo; break;
+                    case '<=':
+                        result = value <= compareTo; break;
+                    default:
+                        /* 
+                        // Referencia eval original (RCE Risk): 
+                        result = eval(`${value}${this._data.condition}${compareTo}`); 
+                        */
+                        throw new Error(`Unsupported operator: ${operator}`);
+                }
+
                 return this.matchingEdgeRoute(edges, result)
             }else{
                 throw new Error(`Bad Edge Format for ${edges}`);

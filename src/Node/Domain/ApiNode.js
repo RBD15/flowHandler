@@ -11,6 +11,10 @@ class ApiNode extends Node{
         this._apiClient = new ApiClient()
     }
 
+    setApiClient(client){
+        this._apiClient = client
+    }
+
     async run(edges,variables){
         console.log("ApiNode");
         try{
@@ -42,8 +46,8 @@ class ApiNode extends Node{
 
             const responseVar = this._data.responseVar
             if(responseVar){
-                const responseData = response?.data
-                if(typeof responseData === 'object' && responseData !== null){
+                const responseData = response?.data || response
+                if(responseData && typeof responseData === 'object'){
                     variables.set(responseVar, JSON.stringify(responseData))
                 }else{
                     variables.set(responseVar, responseData)

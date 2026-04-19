@@ -95,7 +95,16 @@ class FlowCode{
         return this._variables
     }
 
+    getVariables(){
+        return this._variables
+    }
+
     #cloneValue(value) {
+        // Simple data optimization: return primitives as-is
+        if (value === null || typeof value !== 'object') {
+            return value;
+        }
+
         if (value instanceof Map) {
             const obj = {}
             for (const [key, mapValue] of value.entries()) {
@@ -113,20 +122,27 @@ class FlowCode{
         }
 
         if (value && typeof value === 'object') {
+            // Check for circular references or complex objects that shouldn't be cloned
+            if (value.constructor && value.constructor.name !== 'Object' && value.constructor.name !== 'Array') {
+                return value; // Reference non-plain objects to avoid context issues
+            }
             try {
-                return JSON.parse(JSON.stringify(value))
+                const clone = {};
+                for (const key in value) {
+                    if (Object.prototype.hasOwnProperty.call(value, key)) {
+                        clone[key] = this.#cloneValue(value[key]);
+                    }
+                }
+                return clone;
             } catch (e) {
-                return value
+                return value;
             }
         }
-        return value
+        return value;
     }
 
     getState() {
         return {
-            nodes: this._nodes, // No retornamos deepClone momentaneamente por bug en chatbot
-            edges: this._edges, // No retornamos deepClone momentaneamente por bug en chatbot
-            settings: this._settings,
             currentNodeId: this._currentNodeId,
             variables: this.#cloneValue(this._variables),
             visitedNodesId: this.#cloneValue(this._visitedNodesId),
@@ -223,6 +239,11 @@ class FlowCode{
                     }
                 }
     
+                if (!currentNode) {
+                    this._ended = true;
+                    throw new Error(`Flow execution error: Node with ID ${this._currentNodeId} not found`);
+                }
+
                 if(currentNode.type === 'end'){
                     stopped = true
                     this._currentNodeId = null

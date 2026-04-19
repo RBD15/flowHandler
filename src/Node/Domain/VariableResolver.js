@@ -13,6 +13,19 @@ class VariableResolver {
         })
     }
 
+    static resolveValue(input, variables){
+        if(typeof input !== 'string') return input
+        
+        // Single variable case: "#{var}"
+        if(input.startsWith('#{') && input.endsWith('}') && (input.match(/#\{/g) || []).length === 1){
+            const path = input.substring(2, input.length - 1)
+            const val = this.resolvePath(path, variables)
+            return val
+        }
+
+        return this.replaceReferences(input, variables)
+    }
+
     static resolvePath(fullPath, variables){
         const parts = String(fullPath || '').split('.').filter(Boolean)
         if(!parts.length) return undefined

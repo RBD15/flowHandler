@@ -9,9 +9,13 @@ class Node{
         this._data = data
     }
 
-    // getId(){
-    //     return this.#id
-    // }
+    getId(){
+        return this._id
+    }
+
+    getData(){
+        return this._data
+    }
     
     getType(){
         return this._type
@@ -19,6 +23,14 @@ class Node{
 
     setData(data){
         this._data = data
+    }
+
+    log(){
+        console.log(this._type);
+    }
+
+    async execute(variables){
+        return await this.run(null,variables)
     }
 
     async run(edges,variables){

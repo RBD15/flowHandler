@@ -22,50 +22,33 @@ class MenuNode extends Node {
     }
 
     _resolveInputValue(variables) {
-        const rawInput = variables.get('inter_input')
-        if (rawInput === null || rawInput === undefined) return ''
+        const rawInput = variables.get('inter_input');
+        if (rawInput === null || rawInput === undefined) return '';
+
         if (typeof rawInput === 'string' || typeof rawInput === 'number') {
-            return String(rawInput).trim()
+            return String(rawInput).trim();
         }
+
         if (typeof rawInput === 'object') {
-            if (typeof rawInput.inter_input === 'string' || typeof rawInput.inter_input === 'number') {
-                return String(rawInput.inter_input).trim()
-            }
-            if (rawInput.inter_input && typeof rawInput.inter_input === 'object') {
-                const nested = rawInput.inter_input
-                if (typeof nested.dtmf === 'string' || typeof nested.dtmf === 'number') {
-                    return String(nested.dtmf).trim()
+            const prioritizedKeys = ['inter_input', 'msg', 'input', 'dtmf', 'DTMF', 'digit', 'Digit'];
+            
+            for (const key of prioritizedKeys) {
+                if (rawInput[key] !== undefined && rawInput[key] !== null) {
+                    if (typeof rawInput[key] === 'object') {
+                        const nested = rawInput[key];
+                        const nestedKeys = ['dtmf', 'DTMF', 'digit', 'Digit'];
+                        for (const nKey of nestedKeys) {
+                            if (nested[nKey] !== undefined && nested[nKey] !== null) {
+                                return String(nested[nKey]).trim();
+                            }
+                        }
+                    } else {
+                        return String(rawInput[key]).trim();
+                    }
                 }
-                if (typeof nested.DTMF === 'string' || typeof nested.DTMF === 'number') {
-                    return String(nested.DTMF).trim()
-                }
-                if (typeof nested.digit === 'string' || typeof nested.digit === 'number') {
-                    return String(nested.digit).trim()
-                }
-                if (typeof nested.Digit === 'string' || typeof nested.Digit === 'number') {
-                    return String(nested.Digit).trim()
-                }
-            }
-            if (typeof rawInput.msg === 'string' || typeof rawInput.msg === 'number') {
-                return String(rawInput.msg).trim()
-            }
-            if (typeof rawInput.input === 'string' || typeof rawInput.input === 'number') {
-                return String(rawInput.input).trim()
-            }
-            if (typeof rawInput.dtmf === 'string' || typeof rawInput.dtmf === 'number') {
-                return String(rawInput.dtmf).trim()
-            }
-            if (typeof rawInput.DTMF === 'string' || typeof rawInput.DTMF === 'number') {
-                return String(rawInput.DTMF).trim()
-            }
-            if (typeof rawInput.digit === 'string' || typeof rawInput.digit === 'number') {
-                return String(rawInput.digit).trim()
-            }
-            if (typeof rawInput.Digit === 'string' || typeof rawInput.Digit === 'number') {
-                return String(rawInput.Digit).trim()
             }
         }
-        return ''
+        return '';
     }
 
     _setRetries(variables, retries) {

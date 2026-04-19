@@ -5,8 +5,8 @@ services:
     image: mongo:6.0
     container_name: mongo-flow
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: 12345678
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:-secret}
     ports:
-      - 27016:27017
+      - ${MONGO_PORT:-27016}:27017
     
