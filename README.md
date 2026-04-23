@@ -1,5 +1,37 @@
 # FlowHandler Logic for DiagramTool
 
+## GitHub Packages (private)
+
+Package: @rbd15/rd-flow-handler
+Registry: https://npm.pkg.github.com
+
+### Publish
+
+1. Set token with package write permission.
+2. Bump version.
+3. Publish to GitHub Packages.
+
+```bash
+export NODE_AUTH_TOKEN=ghp_xxx
+npm version patch
+npm publish
+```
+
+### Consume from other projects
+
+Use npm alias to keep imports as `rd-flow-handler`:
+
+```json
+"rd-flow-handler": "npm:@rbd15/rd-flow-handler@^0.5.2"
+```
+
+Then install with read token:
+
+```bash
+export NODE_AUTH_TOKEN=ghp_xxx
+npm install
+```
+
 ## Steps for update packages after any modification
 
 # 1) (Opcional pero recomendado) subir versión del paquete
