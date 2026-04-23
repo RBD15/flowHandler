@@ -1,6 +1,6 @@
 {
   "name": "@rbd15/rd-flow-handler",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "FlowHandler logic to run over the Flow edges",
   "main": "src/index.js",
   "exports": {
